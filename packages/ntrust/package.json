@@ -1,10 +1,10 @@
 {
   "name": "ntrust",
   "version": "0.0.0",
-  "description": "Batch-manage trusted publishing relationships between npm packages and CI/CD providers",
+  "description": "Batch-manage npm trusted publishing relationships for monorepo packages",
   "keywords": [
-    "trusted-publish",
     "npm",
+    "trusted-publish",
     "github-actions",
     "gitlab-ci"
   ],

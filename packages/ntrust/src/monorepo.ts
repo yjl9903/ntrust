@@ -122,6 +122,9 @@ export async function findPackages(
     const pnpmWorkspaces = await discoverPnpmWorkspacePackageJsonFiles(rootDir);
     if (pnpmWorkspaces) {
       packageJsonFiles.push(...pnpmWorkspaces);
+    } else {
+      const resolvedFiles = await toPackageJsonFiles(rootDir, './package.json');
+      packageJsonFiles.push(...resolvedFiles);
     }
   }
 

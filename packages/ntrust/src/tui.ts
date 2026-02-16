@@ -17,8 +17,8 @@ export async function confirm(
 
   const rl = createInterface({ input, output });
   try {
-    const answer = await rl.question(`${prompt} [y/N]: `);
-    if (!/^y(es)?$/i.test(answer.trim())) {
+    const answer = await rl.question(`${prompt} [Y/n]: `);
+    if (!/^$|^y(es)?$/i.test(answer.trim())) {
       throw new Error('Operation cancelled by user.');
     }
   } finally {

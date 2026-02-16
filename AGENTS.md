@@ -1,6 +1,6 @@
 # Repository Guidelines
 
-This package ntrust is used to batch-manage trusted publishing relationships between npm packages and CI/CD providers.
+This package ntrust is used to batch-manage npm trusted publishing relationships for monorepo packages.
 
 Reference documents:
 
