@@ -1,6 +1,6 @@
 {
   "name": "ntrust",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Batch-manage npm trusted publishing relationships for monorepo packages",
   "keywords": [
     "npm",
