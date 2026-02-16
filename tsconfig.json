@@ -2,15 +2,21 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "lib": ["ESNext"],
-    "moduleResolution": "Node",
+    "module": "preserve",
+    "lib": [
+      "ESNext"
+    ],
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "strict": true,
     "strictNullChecks": true,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "noEmit": true
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
