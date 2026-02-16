@@ -20,6 +20,11 @@ export interface TrustOptions {
   registry?: string;
 
   /**
+   * CI environment name for trusted publisher claim
+   */
+  env?: string;
+
+  /**
    * Use mise to run npm command
    */
   mise?: boolean;
@@ -33,4 +38,9 @@ export interface TrustOptions {
    * @default false
    */
   dryRun?: boolean;
+
+  /**
+   * @default false
+   */
+  yes?: boolean;
 }

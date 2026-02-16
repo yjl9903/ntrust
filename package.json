@@ -14,6 +14,7 @@
     "preversion": "turbo run test:ci"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.13",
     "bumpp": "latest",
     "prettier": "^3.8.1",
