@@ -5,11 +5,6 @@ export interface TrustOptions {
   provider?: 'github' | 'gitlab';
 
   /**
-   * Filter packages
-   */
-  packages?: string[];
-
-  /**
    * Specify GitHub actions workflow file or GitLab CI/CD file
    */
   file?: string;
@@ -30,12 +25,12 @@ export interface TrustOptions {
   mise?: boolean;
 
   /**
+   * Specify cwd
+   */
+  dir?: string;
+
+  /**
    * @default false
    */
   dryRun?: boolean;
-
-  /**
-   * Keep quiet and only output JSON
-   */
-  json?: boolean;
 }

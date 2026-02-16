@@ -2,26 +2,28 @@ import { breadc } from 'breadc';
 
 import { version, description } from '../package.json';
 
-import { trust } from './trust.ts';
+import { findPackages } from './monorepo.ts';
+import { trust, listRelationships, revokeRelationships } from './trust.ts';
 
 const app = breadc('ntrust', { version, description })
   .option('--file <name>', 'Name of trust pipeline file')
   .option('--repo <name>', 'Name of trust repository')
   .option('--env <name>', 'CI environment name')
+  .option('--registry <url>', 'The base URL of the npm registry')
   .option('--mise', 'Use mise to run npm command')
   .option('--dry-run', 'Show what would done')
-  .option('--json', 'Only output JSON data')
-  .option('--registry <url>', 'The base URL of the npm registry')
-  .option('-y, --yes', 'Automatically answer "yes" to any prompts');
+  .option('-y, --yes', 'Automatically answer "yes" to any prompts')
+  .option('-C, --dir <dir>', 'Specify dir to run command');
 
 app
   .command(
-    '[...packages]',
+    '[...files]',
     'Batch-create trusted relationships between packages and GitHub actions or GitLab CI/CD'
   )
-  .action(async (packages, options) => {
-    return await trust({
-      packages,
+  .action(async (files, options) => {
+    const { packages } = await findPackages(options.dir, files);
+
+    return await trust(packages, {
       ...options
     });
   });
@@ -31,9 +33,10 @@ app
     'github [...packages]',
     'Batch-create trusted relationships between packages and GitHub actions'
   )
-  .action(async (packages, options) => {
-    return await trust({
-      packages,
+  .action(async (files, options) => {
+    const { packages } = await findPackages(options.dir, files);
+
+    return await trust(packages, {
       ...options,
       provider: 'github'
     });
@@ -41,24 +44,31 @@ app
 
 app
   .command(
-    'gitlab [...packages]',
+    'gitlab [...files]',
     'Batch-create trusted relationships between packages and GitLab CI/CD'
   )
-  .action(async (packages, options) => {
-    return await trust({
-      packages,
+  .action(async (files, options) => {
+    const { packages } = await findPackages(options.dir, files);
+
+    return await trust(packages, {
       ...options,
       provider: 'gitlab'
     });
   });
 
-app.command('list [...packages]', 'Batch-list trusted relationships').action(async () => {
-  // TODO
-});
+app
+  .command('list [...files]', 'Batch-list trusted relationships')
+  .action(async (files, options) => {
+    const { packages } = await findPackages(options.dir, files);
+    return await listRelationships(packages, { ...options });
+  });
 
-app.command('revoke [...packages]', 'Batch-revoke trusted relationships').action(async () => {
-  // TODO
-});
+app
+  .command('revoke [...files]', 'Batch-revoke trusted relationships')
+  .action(async (files, options) => {
+    const { packages } = await findPackages(options.dir, files);
+    return await revokeRelationships(packages, { ...options });
+  });
 
 await app.run(process.argv.slice(2)).catch((error) => {
   console.error(error);

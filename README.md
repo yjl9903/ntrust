@@ -1,5 +1,6 @@
 # ntrust
 
+[![version](https://img.shields.io/npm/v/ntrust?label=ntrust)](https://www.npmjs.com/package/ntrust)
 [![CI](https://github.com/yjl9903/ntrust/actions/workflows/ci.yml/badge.svg)](https://github.com/yjl9903/ntrust/actions/workflows/ci.yml)
 
 Batch-manage trusted publishing relationships between npm packages and CI/CD providers.
