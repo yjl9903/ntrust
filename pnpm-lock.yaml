@@ -42,7 +42,7 @@ importers:
   packages/ntrust:
     dependencies:
       breadc:
-        specifier: ^1.0.0-beta.10
+        specifier: ^1.0.0-beta.12
         version: 1.0.0-beta.12
       execa:
         specifier: ^9.6.1
