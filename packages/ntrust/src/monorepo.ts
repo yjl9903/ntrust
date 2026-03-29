@@ -121,6 +121,8 @@ export async function findPackages(
   } else {
     const pnpmWorkspaces = await discoverPnpmWorkspacePackageJsonFiles(rootDir);
     if (pnpmWorkspaces) {
+      const rootPackageJsonFiles = await toPackageJsonFiles(rootDir, './package.json');
+      packageJsonFiles.push(...rootPackageJsonFiles);
       packageJsonFiles.push(...pnpmWorkspaces);
     } else {
       const resolvedFiles = await toPackageJsonFiles(rootDir, './package.json');

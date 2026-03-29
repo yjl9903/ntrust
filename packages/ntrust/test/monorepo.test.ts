@@ -50,6 +50,32 @@ describe('findPackages', () => {
     `);
   });
 
+  it('includes the root package.json when auto-discovering pnpm workspace packages', async () => {
+    const root = await createTempRepo();
+    tempDirs.push(root);
+
+    await writeJson(path.join(root, 'package.json'), {
+      name: 'root-public',
+      version: '1.0.0'
+    });
+    await writeFile(path.join(root, 'pnpm-workspace.yaml'), 'packages:\n  - packages/*\n');
+    await writeJson(path.join(root, 'packages', 'private-a', 'package.json'), {
+      name: '@scope/private-a',
+      private: true
+    });
+    await writeJson(path.join(root, 'packages', 'private-b', 'package.json'), {
+      name: '@scope/private-b',
+      private: true
+    });
+
+    const result = await findPackages(root, []);
+    expect(result.packages).toMatchInlineSnapshot(`
+      [
+        "root-public",
+      ]
+    `);
+  });
+
   it('prefers explicit files over workspace auto-discovery', async () => {
     const root = await createTempRepo();
     tempDirs.push(root);
