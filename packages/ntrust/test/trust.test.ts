@@ -4,7 +4,9 @@ vi.mock('../src/npm.ts', () => {
   return {
     checkNpmVersion: vi.fn(),
     getNpmCommand: vi.fn((args: string[], mise?: boolean) => {
-      const tokens = mise ? ['mise', 'exec', 'npm@^11.10.0', '--', 'npm', ...args] : ['npm', ...args];
+      const tokens = mise
+        ? ['mise', 'exec', 'npm@^11.10.0', '--', 'npm', ...args]
+        : ['npm', ...args];
       return tokens;
     }),
     runNpm: vi.fn()
@@ -19,6 +21,7 @@ vi.mock('../src/git.ts', () => {
 
 import { checkNpmVersion, runNpm } from '../src/npm.ts';
 import { inferRepoInfo } from '../src/git.ts';
+import type { PackageJson } from '../src/monorepo.ts';
 import { listRelationships, revokeRelationships, trust } from '../src/trust.ts';
 
 const checkNpmVersionMock = vi.mocked(checkNpmVersion);
@@ -47,6 +50,97 @@ describe('trust orchestration', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it('validates package.json repository url before granting trust', async () => {
+    const packageJsons: PackageJson[] = [
+      {
+        name: 'pkg-a',
+        packageJsonPath: '/repo/packages/pkg-a/package.json',
+        repositoryUrl: 'git+https://github.com/acme/ntrust.git'
+      }
+    ];
+
+    runNpmMock
+      .mockResolvedValueOnce({
+        command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      })
+      .mockResolvedValueOnce({
+        command: [
+          'npm',
+          'trust',
+          'github',
+          'pkg-a',
+          '--repo',
+          'acme/ntrust',
+          '--file',
+          'release.yml',
+          '--yes'
+        ],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      });
+
+    await trust(['pkg-a'], {
+      yes: true,
+      packageJsons
+    });
+
+    expect(getRunNpmCalls()).toMatchInlineSnapshot(`
+      [
+        {
+          "args": [
+            "trust",
+            "list",
+            "--json",
+            "pkg-a",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+        },
+        {
+          "args": [
+            "trust",
+            "github",
+            "pkg-a",
+            "--repo",
+            "acme/ntrust",
+            "--file",
+            "release.yml",
+            "--yes",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+          "stdio": "inherit",
+        },
+      ]
+    `);
+  });
+
+  it('fails fast when package.json repository url does not match trusted publishing repo', async () => {
+    const packageJsons: PackageJson[] = [
+      {
+        name: 'pkg-a',
+        packageJsonPath: '/repo/packages/pkg-a/package.json',
+        repositoryUrl: 'git+https://github.com/acme/wrong-repo.git'
+      }
+    ];
+
+    await expect(
+      trust(['pkg-a'], {
+        yes: true,
+        packageJsons
+      })
+    ).rejects.toThrowErrorMatchingInlineSnapshot(`
+      [Error: Repository validation failed before granting trusted publishing relationships:
+      - pkg-a (/repo/packages/pkg-a/package.json): package.json "repository.url" is "git+https://github.com/acme/wrong-repo.git" (normalized: "acme/wrong-repo"), expected repo "acme/ntrust".]
+    `);
+
+    expect(runNpmMock).not.toHaveBeenCalled();
   });
 
   it('passes env only to trust command and not to list/revoke', async () => {
@@ -148,7 +242,17 @@ describe('trust orchestration', () => {
         exitCode: 0
       })
       .mockResolvedValueOnce({
-        command: ['npm', 'trust', 'github', 'pkg-a', '--repo', 'acme/ntrust', '--file', 'release.yml', '--yes'],
+        command: [
+          'npm',
+          'trust',
+          'github',
+          'pkg-a',
+          '--repo',
+          'acme/ntrust',
+          '--file',
+          'release.yml',
+          '--yes'
+        ],
         stdout: '',
         stderr: '',
         exitCode: 0
@@ -371,7 +475,17 @@ describe('trust orchestration', () => {
         exitCode: 0
       })
       .mockResolvedValueOnce({
-        command: ['npm', 'trust', 'github', 'pkg-a', '--repo', 'acme/ntrust', '--file', 'release.yml', '--yes'],
+        command: [
+          'npm',
+          'trust',
+          'github',
+          'pkg-a',
+          '--repo',
+          'acme/ntrust',
+          '--file',
+          'release.yml',
+          '--yes'
+        ],
         stdout: '',
         stderr: '',
         exitCode: 0

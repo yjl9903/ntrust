@@ -1,3 +1,5 @@
+import type { PackageJson } from './monorepo.ts';
+
 export interface TrustOptions {
   /**
    * Trust publish provider
@@ -33,6 +35,11 @@ export interface TrustOptions {
    * Specify cwd
    */
   dir?: string;
+
+  /**
+   * Package metadata discovered from package.json files
+   */
+  packageJsons?: PackageJson[];
 
   /**
    * @default false

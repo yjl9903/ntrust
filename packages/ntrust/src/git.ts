@@ -3,6 +3,7 @@ import type { TrustOptions } from './types.ts';
 import { execa } from 'execa';
 
 import { inferGithubWorkflowFile } from './github.ts';
+import { normalizeRepositoryReference } from './repository.ts';
 
 export interface RepoInfo {
   provider: 'github' | 'gitlab';
@@ -10,27 +11,6 @@ export interface RepoInfo {
   repo: string;
 
   file: string;
-}
-
-function normalizeRepoPath(value: string): string {
-  return value
-    .replace(/^\/+/, '')
-    .replace(/\.git$/, '')
-    .trim();
-}
-
-function parseRepoFromRemote(remote: string): string {
-  const sshMatch = remote.match(/^[^@]+@[^:]+:(.+?)(?:\.git)?$/);
-  if (sshMatch) {
-    return normalizeRepoPath(sshMatch[1]);
-  }
-
-  const urlMatch = remote.match(/^[a-z]+:\/\/[^/]+\/(.+?)(?:\.git)?$/i);
-  if (urlMatch) {
-    return normalizeRepoPath(urlMatch[1]);
-  }
-
-  throw new Error(`Unable to parse repository from git remote: ${remote}`);
 }
 
 async function getRepoRoot(cwd: string): Promise<string> {
@@ -74,7 +54,7 @@ export async function inferRepoInfo(options: TrustOptions): Promise<RepoInfo> {
     throw new Error('GitLab provider is not implemented yet.');
   }
 
-  const repo = options.repo ?? parseRepoFromRemote(remote ?? '');
+  const repo = options.repo ?? normalizeRepositoryReference(remote ?? '');
   const segments = repo.split('/').filter(Boolean);
   if (segments.length !== 2) {
     throw new Error(`Expected GitHub repository to be "owner/name", but got "${repo}".`);

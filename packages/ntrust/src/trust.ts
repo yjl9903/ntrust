@@ -1,10 +1,12 @@
 import { dim, lightGreen } from 'breadc';
 
 import type { TrustOptions } from './types.ts';
+import type { PackageJson } from './monorepo.ts';
 
 import { confirm } from './tui.ts';
 import { inferRepoInfo } from './git.ts';
 import { checkNpmVersion, getNpmCommand, runNpm } from './npm.ts';
+import { normalizeRepositoryReference } from './repository.ts';
 
 export interface CommandExecutionResult<T = any> {
   package: string;
@@ -21,6 +23,62 @@ export interface ListResult {
   repository: string;
 }
 
+function getPackageTargets(packages: string[], options: TrustOptions): PackageJson[] {
+  const packageJsonByName = new Map(
+    (options.packageJsons ?? []).map((packageJson) => [packageJson.name, packageJson])
+  );
+
+  return packages.map((packageName) => {
+    return (
+      packageJsonByName.get(packageName) ?? {
+        name: packageName,
+        packageJsonPath: ''
+      }
+    );
+  });
+}
+
+function validateRepositoryAlignment(targets: PackageJson[], expectedRepo: string): void {
+  const manifestBackedTargets = targets.filter((target) => target.packageJsonPath.length > 0);
+  if (manifestBackedTargets.length === 0) {
+    return;
+  }
+
+  const errors: string[] = [];
+
+  for (const target of manifestBackedTargets) {
+    if (!target.repositoryUrl) {
+      errors.push(
+        `- ${target.name} (${target.packageJsonPath}): missing package.json "repository.url"; expected repo "${expectedRepo}".`
+      );
+      continue;
+    }
+
+    let normalizedRepository: string;
+    try {
+      normalizedRepository = normalizeRepositoryReference(target.repositoryUrl);
+    } catch (error) {
+      errors.push(
+        `- ${target.name} (${target.packageJsonPath}): invalid package.json "repository.url" "${target.repositoryUrl}". ${(error as Error).message}`
+      );
+      continue;
+    }
+
+    if (normalizedRepository !== expectedRepo) {
+      errors.push(
+        `- ${target.name} (${target.packageJsonPath}): package.json "repository.url" is "${target.repositoryUrl}" (normalized: "${normalizedRepository}"), expected repo "${expectedRepo}".`
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(
+      'Repository validation failed before granting trusted publishing relationships:\n' +
+        errors.join('\n')
+    );
+  }
+}
+
 /**
  * 1. Check npm version >= 11.10.0
  * 2. Infer repo info
@@ -33,6 +91,9 @@ export interface ListResult {
 export async function trust(packages: string[], options: TrustOptions) {
   const npmVersion = await checkNpmVersion({ cwd: options.dir, mise: options.mise });
   const repoInfo = await inferRepoInfo(options);
+  const targets = getPackageTargets(packages, options);
+
+  validateRepositoryAlignment(targets, repoInfo.repo);
 
   console.log(`${dim('npm')}         ${npmVersion} ${options.mise ? dim('(mise)') : ''}`);
   console.log(`${dim('provider')}    ${repoInfo.provider}`);

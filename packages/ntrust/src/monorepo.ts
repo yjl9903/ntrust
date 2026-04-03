@@ -3,9 +3,18 @@ import { glob, readFile, stat } from 'node:fs/promises';
 
 import yaml from 'js-yaml';
 
+import { getPackageRepositoryUrl, type PackageRepository } from './repository.ts';
+
 interface PackageManifest {
   name?: string;
   private?: boolean;
+  repository?: PackageRepository;
+}
+
+export interface PackageJson {
+  name: string;
+  packageJsonPath: string;
+  repositoryUrl?: string;
 }
 
 async function exists(filePath: string): Promise<boolean> {
@@ -109,7 +118,7 @@ async function readManifest(packageJsonPath: string): Promise<PackageManifest | 
 export async function findPackages(
   dir: string | undefined,
   files: string[]
-): Promise<{ packages: string[]; skipped: string[] }> {
+): Promise<{ packages: string[]; packageJsons: PackageJson[]; skipped: string[] }> {
   const rootDir = path.resolve(dir ?? process.cwd());
   const packageJsonFiles: string[] = [];
 
@@ -132,7 +141,7 @@ export async function findPackages(
 
   const uniquePackageJsonFiles = [...new Set(packageJsonFiles)];
 
-  const packages: string[] = [];
+  const packageJsons: PackageJson[] = [];
   const seenPackageNames = new Set<string>();
   const skipped: string[] = [];
 
@@ -155,21 +164,25 @@ export async function findPackages(
     }
 
     seenPackageNames.add(manifest.name);
-    packages.push(manifest.name);
+    packageJsons.push({
+      name: manifest.name,
+      packageJsonPath: packageJsonFile,
+      repositoryUrl: getPackageRepositoryUrl(manifest.repository)
+    });
   }
 
-  if (packages.length === 0) {
+  if (packageJsons.length === 0) {
     const details =
       skipped.length > 0 ? ` Filtered package.json files:\n- ${skipped.join('\n- ')}` : '';
     throw new Error('No publishable package found.\n' + details);
   }
 
-  packages.sort((lhs, rhs) => {
-    const lscope = lhs.startsWith('@') ? 0 : 1;
-    const rscope = rhs.startsWith('@') ? 0 : 1;
+  packageJsons.sort((lhs, rhs) => {
+    const lscope = lhs.name.startsWith('@') ? 0 : 1;
+    const rscope = rhs.name.startsWith('@') ? 0 : 1;
     if (lscope !== rscope) return lscope - rscope;
-    return lhs.localeCompare(rhs);
+    return lhs.name.localeCompare(rhs.name);
   });
 
-  return { packages, skipped };
+  return { packages: packageJsons.map((packageJson) => packageJson.name), packageJsons, skipped };
 }

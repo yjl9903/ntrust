@@ -28,10 +28,11 @@ const app = breadc('ntrust', { version, description })
 app
   .command('[...files]', 'Batch-create npm trusted publishing relationships for monorepo packages')
   .action(async (files, options) => {
-    const { packages } = await findPackages(options.dir, files ?? []);
+    const { packages, packageJsons } = await findPackages(options.dir, files ?? []);
 
     return await trust(packages, {
-      ...options
+      ...options,
+      packageJsons
     });
   });
 
@@ -41,11 +42,12 @@ app
     'Batch-create npm trusted publishing relationships between packages and GitHub actions'
   )
   .action(async (files, options) => {
-    const { packages } = await findPackages(options.dir, files ?? []);
+    const { packages, packageJsons } = await findPackages(options.dir, files ?? []);
 
     return await trust(packages, {
       ...options,
-      provider: 'github'
+      provider: 'github',
+      packageJsons
     });
   });
 
@@ -55,11 +57,12 @@ app
     'Batch-create npm trusted publishing relationships between packages and GitLab CI/CD'
   )
   .action(async (files, options) => {
-    const { packages } = await findPackages(options.dir, files ?? []);
+    const { packages, packageJsons } = await findPackages(options.dir, files ?? []);
 
     return await trust(packages, {
       ...options,
-      provider: 'gitlab'
+      provider: 'gitlab',
+      packageJsons
     });
   });
 
