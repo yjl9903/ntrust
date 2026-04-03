@@ -53,7 +53,7 @@ Batch-manage npm trusted publishing relationships for monorepo packages
 Usage: ntrust [COMMAND] [OPTIONS]
 
 Commands:
-  ntrust                    Batch-create npm trusted publishing relationships for monorepo packages
+  ntrust [...files]         Batch-create npm trusted publishing relationships for monorepo packages
   ntrust github [...files]  Batch-create npm trusted publishing relationships between packages and GitHub actions
   ntrust gitlab [...files]  Batch-create npm trusted publishing relationships between packages and GitLab CI/CD
   ntrust list [...files]    Batch-list trusted relationships
