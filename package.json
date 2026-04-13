@@ -18,7 +18,7 @@
     "@types/node": "^24.12.2",
     "bumpp": "latest",
     "prettier": "^3.8.2",
-    "tsdown": "^0.21.7",
+    "tsdown": "^0.21.8",
     "tsx": "^4.21.0",
     "turbo": "^2.9.6",
     "typescript": "^6.0.2",
