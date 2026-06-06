@@ -27,6 +27,16 @@ export interface TrustOptions {
   env?: string;
 
   /**
+   * Allow publishing through npm publish.
+   */
+  allowPublish?: boolean;
+
+  /**
+   * Allow publishing through npm stage publish.
+   */
+  allowStagePublish?: boolean;
+
+  /**
    * Use mise to run npm command
    */
   mise?: boolean;

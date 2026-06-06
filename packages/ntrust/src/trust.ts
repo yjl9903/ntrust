@@ -21,6 +21,8 @@ export interface ListResult {
   type: string;
   file: string;
   repository: string;
+  allowPublish?: boolean;
+  allowStagePublish?: boolean;
 }
 
 function getPackageTargets(packages: string[], options: TrustOptions): PackageJson[] {
@@ -79,6 +81,129 @@ function validateRepositoryAlignment(targets: PackageJson[], expectedRepo: strin
   }
 }
 
+interface TrustPermissions {
+  allowPublish: boolean;
+  allowStagePublish: boolean;
+}
+
+function resolveTrustPermissions(options: TrustOptions): TrustPermissions {
+  const allowPublish = options.allowPublish === true;
+  const allowStagePublish = options.allowStagePublish === true;
+
+  if (!allowPublish && !allowStagePublish) {
+    return {
+      allowPublish: true,
+      allowStagePublish
+    };
+  }
+
+  return {
+    allowPublish,
+    allowStagePublish
+  };
+}
+
+function appendTrustPermissionArgs(args: string[], permissions: TrustPermissions): void {
+  if (permissions.allowPublish) {
+    args.push('--allow-publish');
+  }
+
+  if (permissions.allowStagePublish) {
+    args.push('--allow-stage-publish');
+  }
+}
+
+function formatAllowedActions(permissions: Partial<TrustPermissions>): string {
+  const actions: string[] = [];
+
+  if (permissions.allowPublish) {
+    actions.push(lightGreen('publish'));
+  }
+
+  if (permissions.allowStagePublish) {
+    actions.push(lightGreen('stage publish'));
+  }
+
+  if (actions.length > 0) {
+    return actions.join(', ');
+  }
+
+  if (permissions.allowPublish === undefined && permissions.allowStagePublish === undefined) {
+    return dim('unknown');
+  }
+
+  return lightGreen('publish');
+}
+
+function formatLogField(label: string, value: string, width: number): string {
+  return `${dim(label)}${' '.repeat(Math.max(1, width - label.length))}${value}`;
+}
+
+function readBooleanField(record: Record<string, unknown>, keys: string[]): boolean | undefined {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'boolean') {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function getListPermissions(json: ListResult): Partial<TrustPermissions> {
+  const record = json as unknown as Record<string, unknown>;
+  const permissions = record.permissions;
+  let allowPublish = readBooleanField(record, ['allowPublish', 'allow_publish']);
+  let allowStagePublish = readBooleanField(record, [
+    'allowStagePublish',
+    'allow_stage_publish',
+    'allowStage'
+  ]);
+
+  if (Array.isArray(permissions)) {
+    const permissionNames = new Set(permissions.filter((item) => typeof item === 'string'));
+
+    allowPublish ??= permissionNames.has('publish');
+    allowStagePublish ??=
+      permissionNames.has('stage-publish') ||
+      permissionNames.has('stage_publish') ||
+      permissionNames.has('stagePublish');
+  } else if (permissions && typeof permissions === 'object') {
+    const permissionRecord = permissions as Record<string, unknown>;
+    allowPublish ??= readBooleanField(permissionRecord, ['publish', 'allowPublish']);
+    allowStagePublish ??= readBooleanField(permissionRecord, [
+      'stagePublish',
+      'stage-publish',
+      'stage_publish',
+      'allowStagePublish'
+    ]);
+  }
+
+  return {
+    allowPublish,
+    allowStagePublish
+  };
+}
+
+function permissionsMatch(
+  existingPermissions: Partial<TrustPermissions>,
+  targetPermissions: TrustPermissions
+): boolean {
+  if (
+    existingPermissions.allowPublish === undefined &&
+    existingPermissions.allowStagePublish === undefined
+  ) {
+    return true;
+  }
+
+  return (
+    (existingPermissions.allowPublish === undefined ||
+      existingPermissions.allowPublish === targetPermissions.allowPublish) &&
+    (existingPermissions.allowStagePublish === undefined ||
+      existingPermissions.allowStagePublish === targetPermissions.allowStagePublish)
+  );
+}
+
 /**
  * 1. Check npm version >= 11.13.0
  * 2. Infer repo info
@@ -92,17 +217,19 @@ export async function trust(packages: string[], options: TrustOptions) {
   const npmVersion = await checkNpmVersion({ cwd: options.dir, mise: options.mise });
   const repoInfo = await inferRepoInfo(options);
   const targets = getPackageTargets(packages, options);
+  const permissions = resolveTrustPermissions(options);
 
   validateRepositoryAlignment(targets, repoInfo.repo);
 
-  console.log(`${dim('npm')}         ${npmVersion} ${options.mise ? dim('(mise)') : ''}`);
-  console.log(`${dim('provider')}    ${repoInfo.provider}`);
-  console.log(`${dim('repository')}  ${repoInfo.repo}`);
-  console.log(`${dim('workflow')}    ${repoInfo.file}`);
+  console.log(formatLogField('npm', `${npmVersion} ${options.mise ? dim('(mise)') : ''}`, 12));
+  console.log(formatLogField('provider', repoInfo.provider, 12));
+  console.log(formatLogField('repository', repoInfo.repo, 12));
+  console.log(formatLogField('workflow', repoInfo.file, 12));
   if (options.env) {
-    console.log(`${dim('environment')} ${options.env}`);
+    console.log(formatLogField('environment', options.env, 12));
   }
-  console.log(`${dim('packages')}    ${packages.map((name) => lightGreen(name)).join(', ')}`);
+  console.log(formatLogField('actions', formatAllowedActions(permissions), 12));
+  console.log(formatLogField('packages', packages.map((name) => lightGreen(name)).join(', '), 12));
   console.log();
 
   await confirm('Proceed to grant trusted publishing relationships?', {
@@ -117,7 +244,12 @@ export async function trust(packages: string[], options: TrustOptions) {
 
     if (relation.json) {
       const { repository, file } = relation.json;
-      if (repoInfo.repo === repository && repoInfo.file === file) {
+      const existingPermissions = getListPermissions(relation.json);
+      if (
+        repoInfo.repo === repository &&
+        repoInfo.file === file &&
+        permissionsMatch(existingPermissions, permissions)
+      ) {
         // Skip binding relation
         continue;
       } else {
@@ -141,6 +273,8 @@ export async function trust(packages: string[], options: TrustOptions) {
     if (options.env) {
       args.push('--env', options.env);
     }
+
+    appendTrustPermissionArgs(args, permissions);
 
     if (options.registry) {
       args.push('--registry', options.registry);
@@ -186,8 +320,8 @@ export async function trust(packages: string[], options: TrustOptions) {
 export async function listRelationships(packages: string[], options: TrustOptions) {
   const npmVersion = await checkNpmVersion({ cwd: options.dir, mise: options.mise });
 
-  console.log(`${dim('npm')}         ${npmVersion} ${options.mise ? dim('(mise)') : ''}`);
-  console.log(`${dim('packages')}    ${packages.map((name) => lightGreen(name)).join(', ')}`);
+  console.log(formatLogField('npm', `${npmVersion} ${options.mise ? dim('(mise)') : ''}`, 12));
+  console.log(formatLogField('packages', packages.map((name) => lightGreen(name)).join(', '), 12));
 
   const results: CommandExecutionResult<ListResult>[] = [];
   for (const packageName of packages) {
@@ -259,10 +393,12 @@ async function list(
     if (ret.stdout) {
       ret.json = JSON.parse(ret.stdout);
 
-      console.log(`${dim('id')}    ${lightGreen(ret.json.id)}`);
-      console.log(`${dim('type')}  ${lightGreen(ret.json.type)}`);
-      console.log(`${dim('repo')}  ${lightGreen(ret.json.repository)}`);
-      console.log(`${dim('file')}  ${lightGreen(ret.json.file)}`);
+      console.log(formatLogField('id', lightGreen(ret.json.id), 8));
+      console.log(formatLogField('type', lightGreen(ret.json.type), 8));
+      console.log(formatLogField('repo', lightGreen(ret.json.repository), 8));
+      console.log(formatLogField('file', lightGreen(ret.json.file), 8));
+      const permissions = getListPermissions(ret.json);
+      console.log(formatLogField('actions', formatAllowedActions(permissions), 8));
     }
 
     return ret;
@@ -281,8 +417,8 @@ async function list(
 export async function revokeRelationships(packages: string[], options: TrustOptions) {
   const npmVersion = await checkNpmVersion({ cwd: options.dir, mise: options.mise });
 
-  console.log(`${dim('npm')}         ${npmVersion} ${options.mise ? dim('(mise)') : ''}`);
-  console.log(`${dim('packages')}    ${packages.map((name) => lightGreen(name)).join(', ')}`);
+  console.log(formatLogField('npm', `${npmVersion} ${options.mise ? dim('(mise)') : ''}`, 12));
+  console.log(formatLogField('packages', packages.map((name) => lightGreen(name)).join(', '), 12));
 
   const relations: CommandExecutionResult<ListResult>[] = [];
   for (const packageName of packages) {

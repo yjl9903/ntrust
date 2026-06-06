@@ -17,15 +17,17 @@ $ npx ntrust
 # provider    github
 # repository  yjl9903/ntrust
 # workflow    release.yml
+# actions     publish
 # packages    ntrust
 
 # Proceed to grant trusted publishing relationships? [Y/n]: Y
 
 # $ mise exec npm@^11.13.0 -- npm trust list --json ntrust
-# id    eebc175d-4720-4fc8-a31a-6491ca36fb47
-# type  github
-# repo  yjl9903/ntrust
-# file  release.yml
+# id      eebc175d-4720-4fc8-a31a-6491ca36fb47
+# type    github
+# repo    yjl9903/ntrust
+# file    release.yml
+# actions publish
 ```
 
 ## Usage
@@ -60,16 +62,18 @@ Commands:
   ntrust revoke [...files]  Batch-revoke trusted relationships
 
 Options:
-      --file <name>     Name of trust pipeline file
-      --repo <name>     Name of trust repository
-      --env <name>      CI environment name for npm trust claim
-      --registry <url>  The base URL of the npm registry
-      --mise            Use mise to run npm command
-      --dry-run         Show what would be done
-  -y, --yes             Automatically answer "yes" to any prompts
-  -C, --dir <dir>       Specify dir to run command
-  -h, --help            Print help
-  -v, --version         Print version
+      --file <name>          Name of trust pipeline file
+      --repo <name>          Name of trust repository
+      --env <name>           CI environment name for npm trust claim
+      --allow-publish        Allow publishing through npm publish
+      --allow-stage-publish  Allow publishing through npm stage publish
+      --registry <url>       The base URL of the npm registry
+      --mise                 Use mise to run npm command
+      --dry-run              Show what would be done
+  -y, --yes                  Automatically answer "yes" to any prompts
+  -C, --dir <dir>            Specify dir to run command
+  -h, --help                 Print help
+  -v, --version              Print version
 ```
 
 ## Example
@@ -145,15 +149,17 @@ $ npx ntrust
 # provider    github
 # repository  yjl9903/ntrust
 # workflow    release.yml
+# actions     publish
 # packages    ntrust
 
 # Proceed to grant trusted publishing relationships? [Y/n]: Y
 
 # $ mise exec npm@^11.13.0 -- npm trust list --json ntrust
-# id    eebc175d-4720-4fc8-a31a-6491ca36fb47
-# type  github
-# repo  yjl9903/ntrust
-# file  release.yml
+# id      eebc175d-4720-4fc8-a31a-6491ca36fb47
+# type    github
+# repo    yjl9903/ntrust
+# file    release.yml
+# actions publish
 ```
 
 4. After theses setup steps, you only need to push a tag like `v1.0.0` (i.e. use `bumpp`) to trigger GitHub actions publishing your monorepo packages without any extra auth config.

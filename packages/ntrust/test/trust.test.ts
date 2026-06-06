@@ -112,6 +112,7 @@ describe('trust orchestration', () => {
             "--file",
             "release.yml",
             "--yes",
+            "--allow-publish",
           ],
           "cwd": undefined,
           "mise": undefined,
@@ -223,6 +224,7 @@ describe('trust orchestration', () => {
             "--yes",
             "--env",
             "production",
+            "--allow-publish",
           ],
           "cwd": "/repo",
           "mise": undefined,
@@ -293,6 +295,7 @@ describe('trust orchestration', () => {
             "--file",
             "release.yml",
             "--yes",
+            "--allow-publish",
           ],
           "cwd": undefined,
           "mise": undefined,
@@ -318,6 +321,7 @@ describe('trust orchestration', () => {
             "--file",
             "release.yml",
             "--yes",
+            "--allow-publish",
           ],
           "cwd": undefined,
           "mise": undefined,
@@ -399,6 +403,135 @@ describe('trust orchestration', () => {
     expect(runNpmMock).toHaveBeenCalledTimes(2);
   });
 
+  it('passes stage-only permission when allowStagePublish is explicitly set', async () => {
+    runNpmMock
+      .mockResolvedValueOnce({
+        command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      })
+      .mockResolvedValueOnce({
+        command: [
+          'npm',
+          'trust',
+          'github',
+          'pkg-a',
+          '--repo',
+          'acme/ntrust',
+          '--file',
+          'release.yml',
+          '--yes',
+          '--allow-stage-publish'
+        ],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      });
+
+    await trust(['pkg-a'], {
+      yes: true,
+      allowStagePublish: true
+    });
+
+    expect(getRunNpmCalls()).toMatchInlineSnapshot(`
+      [
+        {
+          "args": [
+            "trust",
+            "list",
+            "--json",
+            "pkg-a",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+        },
+        {
+          "args": [
+            "trust",
+            "github",
+            "pkg-a",
+            "--repo",
+            "acme/ntrust",
+            "--file",
+            "release.yml",
+            "--yes",
+            "--allow-stage-publish",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+          "stdio": "inherit",
+        },
+      ]
+    `);
+  });
+
+  it('passes both permissions when both allow flags are explicitly set', async () => {
+    runNpmMock
+      .mockResolvedValueOnce({
+        command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      })
+      .mockResolvedValueOnce({
+        command: [
+          'npm',
+          'trust',
+          'github',
+          'pkg-a',
+          '--repo',
+          'acme/ntrust',
+          '--file',
+          'release.yml',
+          '--yes',
+          '--allow-publish',
+          '--allow-stage-publish'
+        ],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      });
+
+    await trust(['pkg-a'], {
+      yes: true,
+      allowPublish: true,
+      allowStagePublish: true
+    });
+
+    expect(getRunNpmCalls()).toMatchInlineSnapshot(`
+      [
+        {
+          "args": [
+            "trust",
+            "list",
+            "--json",
+            "pkg-a",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+        },
+        {
+          "args": [
+            "trust",
+            "github",
+            "pkg-a",
+            "--repo",
+            "acme/ntrust",
+            "--file",
+            "release.yml",
+            "--yes",
+            "--allow-publish",
+            "--allow-stage-publish",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+          "stdio": "inherit",
+        },
+      ]
+    `);
+  });
+
   it('list supports dry-run with json command and no npm execution', async () => {
     const result = await listRelationships(['pkg-a'], {
       dryRun: true
@@ -422,6 +555,28 @@ describe('trust orchestration', () => {
     expect(runNpmMock).not.toHaveBeenCalled();
   });
 
+  it('prints publish action when list returns no enabled actions', async () => {
+    runNpmMock.mockResolvedValueOnce({
+      command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
+      stdout: JSON.stringify({
+        id: 'rel-1',
+        type: 'github',
+        file: 'release.yml',
+        repository: 'acme/ntrust',
+        allowPublish: false,
+        allowStagePublish: false
+      }),
+      stderr: '',
+      exitCode: 0
+    });
+
+    await listRelationships(['pkg-a'], {});
+
+    const logs = vi.mocked(console.log).mock.calls.map(([line]) => String(line));
+    expect(logs.some((line) => line.includes('actions') && line.includes('publish'))).toBe(true);
+    expect(logs.some((line) => line.includes('none'))).toBe(false);
+  });
+
   it('skips package when existing relationship already matches target repo and workflow', async () => {
     runNpmMock.mockResolvedValueOnce({
       command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
@@ -429,7 +584,9 @@ describe('trust orchestration', () => {
         id: 'rel-1',
         type: 'github',
         file: 'release.yml',
-        repository: 'acme/ntrust'
+        repository: 'acme/ntrust',
+        allowPublish: true,
+        allowStagePublish: false
       }),
       stderr: '',
       exitCode: 0
@@ -453,6 +610,91 @@ describe('trust orchestration', () => {
       ]
     `);
     expect(runNpmMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('revokes existing relationship when permissions differ from requested permissions', async () => {
+    runNpmMock
+      .mockResolvedValueOnce({
+        command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
+        stdout: JSON.stringify({
+          id: 'rel-old',
+          type: 'github',
+          file: 'release.yml',
+          repository: 'acme/ntrust',
+          allowPublish: false,
+          allowStagePublish: true
+        }),
+        stderr: '',
+        exitCode: 0
+      })
+      .mockResolvedValueOnce({
+        command: ['npm', 'trust', 'revoke', '--id', 'rel-old', 'pkg-a'],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      })
+      .mockResolvedValueOnce({
+        command: [
+          'npm',
+          'trust',
+          'github',
+          'pkg-a',
+          '--repo',
+          'acme/ntrust',
+          '--file',
+          'release.yml',
+          '--yes',
+          '--allow-publish'
+        ],
+        stdout: '',
+        stderr: '',
+        exitCode: 0
+      });
+
+    await trust(['pkg-a'], { yes: true });
+
+    expect(getRunNpmCalls()).toMatchInlineSnapshot(`
+      [
+        {
+          "args": [
+            "trust",
+            "list",
+            "--json",
+            "pkg-a",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+        },
+        {
+          "args": [
+            "trust",
+            "revoke",
+            "--id",
+            "rel-old",
+            "pkg-a",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+          "stdio": "inherit",
+        },
+        {
+          "args": [
+            "trust",
+            "github",
+            "pkg-a",
+            "--repo",
+            "acme/ntrust",
+            "--file",
+            "release.yml",
+            "--yes",
+            "--allow-publish",
+          ],
+          "cwd": undefined,
+          "mise": undefined,
+          "stdio": "inherit",
+        },
+      ]
+    `);
   });
 
   it('revokes existing mismatched relationship before creating a new one', async () => {
@@ -527,6 +769,7 @@ describe('trust orchestration', () => {
             "--file",
             "release.yml",
             "--yes",
+            "--allow-publish",
           ],
           "cwd": undefined,
           "mise": undefined,
