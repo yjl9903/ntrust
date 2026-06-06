@@ -577,6 +577,31 @@ describe('trust orchestration', () => {
     expect(logs.some((line) => line.includes('none'))).toBe(false);
   });
 
+  it('prints both actions from npm trust permissions array', async () => {
+    runNpmMock.mockResolvedValueOnce({
+      command: ['npm', 'trust', 'list', '--json', 'pkg-a'],
+      stdout: JSON.stringify({
+        id: 'rel-1',
+        type: 'github',
+        file: 'release.yml',
+        repository: 'acme/ntrust',
+        permissions: ['createPackage', 'createStagedPackage']
+      }),
+      stderr: '',
+      exitCode: 0
+    });
+
+    await listRelationships(['pkg-a'], {});
+
+    const logs = vi.mocked(console.log).mock.calls.map(([line]) => String(line));
+    expect(
+      logs.some(
+        (line) =>
+          line.includes('actions') && line.includes('publish') && line.includes('stage publish')
+      )
+    ).toBe(true);
+  });
+
   it('skips package when existing relationship already matches target repo and workflow', async () => {
     runNpmMock.mockResolvedValueOnce({
       command: ['npm', 'trust', 'list', '--json', 'pkg-a'],

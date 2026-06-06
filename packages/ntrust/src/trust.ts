@@ -163,11 +163,12 @@ function getListPermissions(json: ListResult): Partial<TrustPermissions> {
   if (Array.isArray(permissions)) {
     const permissionNames = new Set(permissions.filter((item) => typeof item === 'string'));
 
-    allowPublish ??= permissionNames.has('publish');
+    allowPublish ??= permissionNames.has('publish') || permissionNames.has('createPackage');
     allowStagePublish ??=
       permissionNames.has('stage-publish') ||
       permissionNames.has('stage_publish') ||
-      permissionNames.has('stagePublish');
+      permissionNames.has('stagePublish') ||
+      permissionNames.has('createStagedPackage');
   } else if (permissions && typeof permissions === 'object') {
     const permissionRecord = permissions as Record<string, unknown>;
     allowPublish ??= readBooleanField(permissionRecord, ['publish', 'allowPublish']);
