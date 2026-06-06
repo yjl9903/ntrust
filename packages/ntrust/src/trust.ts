@@ -80,7 +80,7 @@ function validateRepositoryAlignment(targets: PackageJson[], expectedRepo: strin
 }
 
 /**
- * 1. Check npm version >= 11.10.0
+ * 1. Check npm version >= 11.13.0
  * 2. Infer repo info
  * 3. Print all the inferred info, and waiting for confirm
  * 4. Run npm trust
@@ -176,7 +176,7 @@ export async function trust(packages: string[], options: TrustOptions) {
 }
 
 /**
- * 1. Check npm version >= 11.10.0
+ * 1. Check npm version >= 11.13.0
  * 2. Run npm trust list
  * 3. Print trust list
  *
@@ -270,7 +270,7 @@ async function list(
 }
 
 /**
- * 1. Check npm version >= 11.10.0
+ * 1. Check npm version >= 11.13.0
  * 2. Run npm trust list
  * 3. Print trust list and waiting for confirm
  * 4. Run npm trust revoke

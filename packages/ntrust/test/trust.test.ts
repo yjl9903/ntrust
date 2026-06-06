@@ -5,7 +5,7 @@ vi.mock('../src/npm.ts', () => {
     checkNpmVersion: vi.fn(),
     getNpmCommand: vi.fn((args: string[], mise?: boolean) => {
       const tokens = mise
-        ? ['mise', 'exec', 'npm@^11.10.0', '--', 'npm', ...args]
+        ? ['mise', 'exec', 'npm@^11.13.0', '--', 'npm', ...args]
         : ['npm', ...args];
       return tokens;
     }),
@@ -40,7 +40,7 @@ describe('trust orchestration', () => {
     runNpmMock.mockReset();
     inferRepoInfoMock.mockReset();
 
-    checkNpmVersionMock.mockResolvedValue('11.10.0');
+    checkNpmVersionMock.mockResolvedValue('11.13.0');
     inferRepoInfoMock.mockResolvedValue({
       provider: 'github',
       repo: 'acme/ntrust',

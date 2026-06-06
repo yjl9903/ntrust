@@ -13,7 +13,7 @@ Batch-manage npm trusted publishing relationships for monorepo packages.
 
 ```bash
 $ npx ntrust
-# npm         11.10.0 (mise)
+# npm         11.13.0 (mise)
 # provider    github
 # repository  yjl9903/ntrust
 # workflow    release.yml
@@ -21,7 +21,7 @@ $ npx ntrust
 
 # Proceed to grant trusted publishing relationships? [Y/n]: Y
 
-# $ mise exec npm@^11.10.0 -- npm trust list --json ntrust
+# $ mise exec npm@^11.13.0 -- npm trust list --json ntrust
 # id    eebc175d-4720-4fc8-a31a-6491ca36fb47
 # type  github
 # repo  yjl9903/ntrust
@@ -141,7 +141,7 @@ jobs:
 
 ```bash
 $ npx ntrust
-# npm         11.10.0 (mise)
+# npm         11.13.0 (mise)
 # provider    github
 # repository  yjl9903/ntrust
 # workflow    release.yml
@@ -149,7 +149,7 @@ $ npx ntrust
 
 # Proceed to grant trusted publishing relationships? [Y/n]: Y
 
-# $ mise exec npm@^11.10.0 -- npm trust list --json ntrust
+# $ mise exec npm@^11.13.0 -- npm trust list --json ntrust
 # id    eebc175d-4720-4fc8-a31a-6491ca36fb47
 # type  github
 # repo  yjl9903/ntrust

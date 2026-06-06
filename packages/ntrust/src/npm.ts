@@ -1,6 +1,6 @@
 import { execa } from 'execa';
 
-export const MIN_NPM_VERSION = '11.10.0';
+export const MIN_NPM_VERSION = '11.13.0';
 
 export interface RunNpmOptions {
   args: string[];
@@ -17,7 +17,7 @@ export interface RunNpmResult {
 }
 
 export function getNpmCommand(args: string[], mise?: boolean) {
-  const tokens = mise ? ['mise', 'exec', 'npm@^11.10.0', '--', 'npm', ...args] : ['npm', ...args];
+  const tokens = mise ? ['mise', 'exec', 'npm@^11.13.0', '--', 'npm', ...args] : ['npm', ...args];
   return tokens;
 }
 
