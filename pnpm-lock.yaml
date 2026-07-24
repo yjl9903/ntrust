@@ -16,7 +16,7 @@ importers:
         version: 24.13.2
       bumpp:
         specifier: latest
-        version: 11.1.0
+        version: 12.0.0
       prettier:
         specifier: ^3.8.5
         version: 3.8.5
@@ -42,8 +42,8 @@ importers:
   packages/ntrust:
     dependencies:
       breadc:
-        specifier: 1.0.0-beta.15
-        version: 1.0.0-beta.15
+        specifier: 1.0.0-beta.17
+        version: 1.0.0-beta.17
       execa:
         specifier: 9.6.1
         version: 9.6.1
@@ -74,17 +74,17 @@ packages:
     resolution: {integrity: sha512-K8ponJDxBwDHigkeFqaqT5wLGl4bTlwMafR8k7b5CPxr6Ww+UG9ls8Yx6Tcpboxu97eeGVEEyKcHmEyOwN1vSw==}
     engines: {node: ^22.18.0 || >=24.11.0}
 
-  '@breadc/color@1.0.0-beta.15':
-    resolution: {integrity: sha512-+MsvbAa/FItcwQNwnI8btpsOkhl5C1ls51doerSVS3bXgBovQ/0n0hIW6U1RkPbqQQIajHpFMXrjA5A/qwBrJg==}
+  '@breadc/color@1.0.0-beta.17':
+    resolution: {integrity: sha512-dSYneiJL+nuMv7PcQ2ZnllSuggZX9vuyfYZ+AkB3+e0fUwBuhJsQvLoUDL+ok5MjtO2orV+NvsNxaVDxsXAMmA==}
 
-  '@breadc/core@1.0.0-beta.15':
-    resolution: {integrity: sha512-nLVdjVVZrhqJ0JDNn9uMsQFVcseBknTdmyXj4UOi7EnleN0YT1p3ofs1sjYx7HB5Kd35l0XtX2CAQ1Qom31ssQ==}
+  '@breadc/core@1.0.0-beta.17':
+    resolution: {integrity: sha512-c+8h+N58KjOhYgm1oA41yNNfwKhSglwEatQIpzZ81sR0N8jOUs7n6ohmXmNaR+Id/oZiZ7c1aum1L46jXqDP1Q==}
 
-  '@breadc/death@1.0.0-beta.15':
-    resolution: {integrity: sha512-cerDS3oXK18CtUusg2Jy2hxdYTdz5sk4bGIVZW9nLLPiT7l+ehxMnEjxuYv9GnvBv8olG0NSgbchxlhAPWNZRQ==}
+  '@breadc/death@1.0.0-beta.17':
+    resolution: {integrity: sha512-4Gt0HRsul5RnBR2UVXiRHvI8cvqm88i04tVoNIMjlt+pc5EQdH7yvJF8/0YNWFAAvJnRjh81WM1fyWDPQTf7Qg==}
 
-  '@breadc/tui@1.0.0-beta.15':
-    resolution: {integrity: sha512-WL7jP+BCecQsLQ4iwv2Y0GswcGuRAwY82axo7+DvuksZqG79gWSTuBHRKOAbnFjLf3KOyR1c4wIJS/5QP1GhbA==}
+  '@breadc/tui@1.0.0-beta.17':
+    resolution: {integrity: sha512-whsiEmvXbvp0WofrYWyHJPjbv5xkMD1Qu02xgUvvwaCcS5paMonmyw9HZOpfEHJJoscrn/M6YWKszendaixxLA==}
 
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
@@ -489,12 +489,12 @@ packages:
   birpc@4.0.0:
     resolution: {integrity: sha512-LShSxJP0KTmd101b6DRyGBj57LZxSDYWKitQNW/mi8GRMvZb078Uf9+pveax1DrVL89vm7mWe+TovdI/UDOuPw==}
 
-  breadc@1.0.0-beta.15:
-    resolution: {integrity: sha512-q2Odd3daDlwDENFv0s1oeVMIrsdXJuMItwo4ejKhL59sCYQmPeI/s+76URas9I6mZQxUbR4S99LyKolcgh3m7w==}
+  breadc@1.0.0-beta.17:
+    resolution: {integrity: sha512-xLmWETFx5SReU2WS453Y0dfOGXnihLnwQt+00clK8f4wrEzlqsUjdg39o7IxVW6+4IR2iK2eE3y0ljxF/gq9Mw==}
 
-  bumpp@11.1.0:
-    resolution: {integrity: sha512-jdwOGMyX8JIqpQ0N2RMRR87DHZaoJnUtui5lU9LqFfFK5JC0H8qY9uWqXoa+dEWt/K7rOmmsoyiZB8RBM7RPBQ==}
-    engines: {node: '>=20.19.0'}
+  bumpp@12.0.0:
+    resolution: {integrity: sha512-2uuObtROJvEGZJk4T6t3fDgUAmgDYF0PeSZt23GCn1ItxECvR+ROVJNYT7r1lS8nIMJae6IkIgcDEIbT5iwWAA==}
+    engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     hasBin: true
 
   cac@7.0.0:
@@ -713,8 +713,8 @@ packages:
     resolution: {integrity: sha512-9miFgM2OFba7hB+pRgvtV84pYTBaoTHohvmIgiRt6dRIzbwEOIaNaP+dIlGs2fNFoB0SeISs0Jz5WFVRid6Xyg==}
     engines: {node: '>=12.20.0'}
 
-  package-manager-detector@1.6.0:
-    resolution: {integrity: sha512-61A5ThoTiDG/C8s8UMZwSorAGwMJ0ERVGj2OjoW5pAalsNOg15+iQiPzrLJ4jhZ1HJzmC2PIHT2oEiH3R5fzNA==}
+  package-manager-detector@1.8.0:
+    resolution: {integrity: sha512-yQA4H19AmPEoMUeavPMDIe1higySl/gH/yaQrkT/s07Qp+7pp2hYz30N3z2l5BkjVkF9Ow6o0wjJamm2y7Sn0A==}
 
   parse-ms@4.0.0:
     resolution: {integrity: sha512-TXfryirbmq34y8QBwgqCVLi+8oA3oWx2eAnSn62ITyEhEYaWRlVZ2DvMM9eZbMs/RfxPu/PK/aBLyGj4IrqMHw==}
@@ -902,6 +902,10 @@ packages:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
 
+  verkit@0.1.2:
+    resolution: {integrity: sha512-WqkT8n3hqizuCu71W3bUzf5fjBmkbXcudsehe/NbxA8PgqoKnSOY5K0Ba2ckg1qaRaSpSz7as/n9K1R9JXjQKg==}
+    engines: {node: '>=18.12.0'}
+
   vite@8.1.0:
     resolution: {integrity: sha512-BuJcQK/56NQTWDGn4ABea3q4SSBdNPWwNZKTkkUpcMPnLoquSYH8llRtSUIgoL1KSCpHt5eghLShn50mH36y7Q==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1029,17 +1033,17 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0
       '@babel/helper-validator-identifier': 8.0.2
 
-  '@breadc/color@1.0.0-beta.15': {}
+  '@breadc/color@1.0.0-beta.17': {}
 
-  '@breadc/core@1.0.0-beta.15':
+  '@breadc/core@1.0.0-beta.17':
     dependencies:
-      '@breadc/color': 1.0.0-beta.15
+      '@breadc/color': 1.0.0-beta.17
 
-  '@breadc/death@1.0.0-beta.15': {}
+  '@breadc/death@1.0.0-beta.17': {}
 
-  '@breadc/tui@1.0.0-beta.15':
+  '@breadc/tui@1.0.0-beta.17':
     dependencies:
-      '@breadc/color': 1.0.0-beta.15
+      '@breadc/color': 1.0.0-beta.17
       get-east-asian-width: 1.6.0
       std-env: 4.1.0
       strip-ansi: 7.2.0
@@ -1321,23 +1325,23 @@ snapshots:
 
   birpc@4.0.0: {}
 
-  breadc@1.0.0-beta.15:
+  breadc@1.0.0-beta.17:
     dependencies:
-      '@breadc/color': 1.0.0-beta.15
-      '@breadc/core': 1.0.0-beta.15
-      '@breadc/death': 1.0.0-beta.15
-      '@breadc/tui': 1.0.0-beta.15
+      '@breadc/color': 1.0.0-beta.17
+      '@breadc/core': 1.0.0-beta.17
+      '@breadc/death': 1.0.0-beta.17
+      '@breadc/tui': 1.0.0-beta.17
 
-  bumpp@11.1.0:
+  bumpp@12.0.0:
     dependencies:
       args-tokenizer: 0.3.0
       cac: 7.0.0
       jsonc-parser: 3.3.1
-      package-manager-detector: 1.6.0
-      semver: 7.8.5
+      package-manager-detector: 1.8.0
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       unconfig: 7.5.0
+      verkit: 0.1.2
       yaml: 2.9.0
 
   cac@7.0.0: {}
@@ -1520,7 +1524,7 @@ snapshots:
 
   obug@2.1.3: {}
 
-  package-manager-detector@1.6.0: {}
+  package-manager-detector@1.8.0: {}
 
   parse-ms@4.0.0: {}
 
@@ -1686,6 +1690,8 @@ snapshots:
   undici-types@7.18.2: {}
 
   unicorn-magic@0.3.0: {}
+
+  verkit@0.1.2: {}
 
   vite@8.1.0(@types/node@24.13.2)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
