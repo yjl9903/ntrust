@@ -19,7 +19,7 @@ This repository is a pnpm + Turborepo monorepo.
 
 ## Build, Test, and Development Commands
 
-Use Node `>=24` and pnpm `10.x`.
+Use Node `>=24` and pnpm `12.x` (the exact version is pinned in `package.json`).
 
 - `pnpm install`: Install workspace dependencies.
 - `pnpm build`: Run Turborepo build pipeline (`tsdown` for packages).
