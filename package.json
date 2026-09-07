@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.13.2",
+    "@types/node": "^24.13.3",
     "bumpp": "latest",
     "prettier": "^3.8.5",
     "tsdown": "^0.23.0",
