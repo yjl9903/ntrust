@@ -8,7 +8,7 @@ vi.mock('execa', () => {
 
 import { execa } from 'execa';
 
-import { runNpm } from '../src/npm.ts';
+import { checkNpmVersion, runNpm } from '../src/npm.ts';
 
 const execaMock = execa as unknown as {
   mockReset: () => void;
@@ -20,6 +20,30 @@ const execaMock = execa as unknown as {
 describe('runNpm', () => {
   beforeEach(() => {
     execaMock.mockReset();
+  });
+
+  it('checks the npm version through mise using the latest release', async () => {
+    execaMock.mockResolvedValue({
+      stdout: '12.2.0\n',
+      stderr: '',
+      exitCode: 0
+    });
+
+    await expect(checkNpmVersion({ cwd: '/workspace', mise: true })).resolves.toBe('12.2.0');
+
+    expect(execa).toHaveBeenCalledWith(
+      'mise',
+      ['exec', 'npm@latest', '--', 'npm', '--version', '--loglevel=error'],
+      { cwd: '/workspace', stdio: 'pipe' }
+    );
+  });
+
+  it('rejects an npm version below the minimum even when using mise', async () => {
+    execaMock.mockResolvedValue({ stdout: '11.12.1\n', stderr: '', exitCode: 0 });
+
+    await expect(checkNpmVersion({ mise: true })).rejects.toThrow(
+      'npm version 11.13.0 or newer is required, but got 11.12.1'
+    );
   });
 
   it('uses pipe stdio by default', async () => {

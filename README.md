@@ -22,7 +22,7 @@ $ npx ntrust
 
 # Proceed to grant trusted publishing relationships? [Y/n]: Y
 
-# $ mise exec npm@^11.13.0 -- npm trust list --json ntrust
+# $ mise exec npm@latest -- npm trust list --json ntrust
 # id      eebc175d-4720-4fc8-a31a-6491ca36fb47
 # type    github
 # repo    yjl9903/ntrust
@@ -154,7 +154,7 @@ $ npx ntrust
 
 # Proceed to grant trusted publishing relationships? [Y/n]: Y
 
-# $ mise exec npm@^11.13.0 -- npm trust list --json ntrust
+# $ mise exec npm@latest -- npm trust list --json ntrust
 # id      eebc175d-4720-4fc8-a31a-6491ca36fb47
 # type    github
 # repo    yjl9903/ntrust

@@ -4,9 +4,7 @@ vi.mock('../src/npm.ts', () => {
   return {
     checkNpmVersion: vi.fn(),
     getNpmCommand: vi.fn((args: string[], mise?: boolean) => {
-      const tokens = mise
-        ? ['mise', 'exec', 'npm@^11.13.0', '--', 'npm', ...args]
-        : ['npm', ...args];
+      const tokens = mise ? ['mise', 'exec', 'npm@latest', '--', 'npm', ...args] : ['npm', ...args];
       return tokens;
     }),
     runNpm: vi.fn()
