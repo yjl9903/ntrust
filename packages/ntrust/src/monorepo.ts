@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { glob, readFile, stat } from 'node:fs/promises';
 
-import yaml from 'js-yaml';
+import { load as loadYaml } from 'js-yaml';
 
 import { getPackageRepositoryUrl, type PackageRepository } from './repository.ts';
 
@@ -71,7 +71,7 @@ async function discoverPnpmWorkspacePackageJsonFiles(
   }
 
   const content = await readFile(workspacePath, 'utf8');
-  const workspace = yaml.load(content) as { packages?: unknown };
+  const workspace = loadYaml(content) as { packages?: unknown };
   if (!workspace || !Array.isArray(workspace.packages)) {
     return undefined;
   }

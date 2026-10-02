@@ -3,7 +3,7 @@ import type { Dirent } from 'node:fs';
 import path from 'node:path';
 import { readdir, readFile } from 'node:fs/promises';
 
-import yaml from 'js-yaml';
+import { load as loadYaml } from 'js-yaml';
 
 interface PublishCommandMatch {
   file: string;
@@ -72,7 +72,7 @@ async function collectPublishCommandMatches(repoRoot: string): Promise<PublishCo
   for (const workflowFile of workflowFiles) {
     const workflowPath = path.join(workflowDir, workflowFile);
     const content = await readFile(workflowPath, 'utf8');
-    const workflow = yaml.load(content);
+    const workflow = loadYaml(content);
 
     if (!isRecord(workflow) || !isRecord(workflow.jobs)) {
       continue;
